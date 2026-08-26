@@ -6,15 +6,24 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ## 2026-08-25
 
-**Publicación y modelo de negocio**
+**Cambios en el programa de desarrollo del mapa**
 
-- Se resolvieron las notas de producto pendientes sobre el mapa técnico:
-  - Compatibilidad **MT4 y MT5** explícita en la propuesta de arquitectura (antes solo mencionaba MT4).
-  - **Prioridad de producto**: sistema de competición comunitaria primero; cuentas de fondeo incluidas pero en segundo plano del roadmap (no en la primera versión).
-  - Modelo de negocio propio reemplazó al de la plataforma de referencia: **Free** ($0, construir sin conectar cuentas) → **Premium** ($27 USD/mes, construir + demo + real) → **Golden** ($35 USD/mes, todo lo anterior + robot en producción, clases de agentes de IA, cursos de indicadores). Comunidad MexTradeBot incluida en los tres planes.
-- Contenido de la presentación para XM preparado en 10 tarjetas (límite del plan gratuito de Gamma) — Gamma vía MCP falló por créditos de API insuficientes (pool separado del de la cuenta web, que sí tenía 400 créditos) — se optó por generar manualmente pegando texto en gamma.app.
-- Repo creado por Ricardo: `mextradebot-maker/mextradebot-mapa-tecnico`. Se preparó localmente (`index.html` + `README.md`), commit hecho, remoto configurado — el `git push` lo corrió Ricardo directamente (en esta sesión el push por git se cuelga pidiendo login interactivo).
-- **Desplegado en Vercel** bajo el team `mextradebot-9549`.
+- Compatibilidad **MT4 y MT5** explícita en la propuesta de arquitectura (antes solo mencionaba MT4) — MexTradeBot construye robots indistintamente para ambas plataformas.
+- **Prioridad de producto** redefinida: sistema de competición comunitaria primero; cuentas de fondeo incluidas en la propuesta pero en segundo plano del roadmap (no en la primera versión). Se marcó explícitamente la sección de fondeo del mapa como "Prioridad secundaria".
+- Modelo de negocio propio reemplazó al de la plataforma de referencia que se había usado como placeholder: **Free** ($0, construir sin conectar cuentas) → **Premium** ($27 USD/mes, construir + conectar demo + conectar real) → **Golden** ($35 USD/mes, todo lo anterior + elegir un robot ya hecho en producción, clases de agentes de IA que construyen robots, cursos de indicadores). Comunidad MexTradeBot incluida en los tres planes.
+- Contenido de la presentación para XM preparado y redactado en 10 tarjetas (límite del plan gratuito de Gamma), documentando el proceso completo: infraestructura n8n, metodología de trading, categorías de indicadores/estrategias aprendidas, hallazgos de la investigación, y la propuesta.
+
+**Apertura de GitHub**
+
+- Ricardo creó el repositorio `mextradebot-maker/mextradebot-mapa-tecnico`.
+- Se preparó el proyecto localmente (`index.html` con el mapa técnico + `README.md`), con commit y remoto ya configurados desde esta sesión.
+- El `git push` lo corrió Ricardo directamente desde su terminal — en esta sesión el push por git se cuelga pidiendo login interactivo, así que ese paso queda siempre de su lado.
+
+**Apertura de Vercel y despliegue**
+
+- Ricardo registró el team `mextradebot-9549` en Vercel.
+- Se importó el repositorio de GitHub como proyecto estático (framework "Other", sin build ni variables de entorno).
+- **Deploy completado y confirmado en vivo** — el mapa técnico ya está publicado.
 
 **Por qué:** el mapa técnico se prepara para presentárselo a XM como propuesta de alianza (broker oficial exclusivo) — de ahí el rebranding de marca, el broker único, y que el modelo de negocio y las prioridades de producto queden reflejados con precisión antes de esa reunión.
 

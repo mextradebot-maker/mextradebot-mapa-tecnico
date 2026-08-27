@@ -333,7 +333,8 @@
       <li><a href="#ia"><span class="num">07</span>IA aplicada</a></li>
       <li><a href="#fondeo"><span class="num">08</span>Cuentas de fondeo</a></li>
       <li><a href="#hallazgo"><span class="num">09</span>El hallazgo clave</a></li>
-      <li><a href="#fuentes"><span class="num">10</span>Fuentes</a></li>
+      <li><a href="#bitacora"><span class="num">10</span>Bitácora</a></li>
+      <li><a href="#fuentes"><span class="num">11</span>Fuentes</a></li>
     </ul>
     <div class="toc-group">MexTradeBot</div>
     <ul class="toc">
@@ -656,7 +657,33 @@
         </ol>
       </section>
 
-      <!-- 10 / footer -->
+      <!-- 10 -->
+      <section id="bitacora">
+        <div class="sec-head"><span class="sec-num">10</span><h2>Bitácora</h2></div>
+        <p class="sec-dek">Registro de trabajo día por día en este proyecto — qué se hizo, qué se decidió y por qué.</p>
+
+        <h3>2026-08-26 — Diseño de la conectividad</h3>
+        <p>Se agregó el capítulo de Conectividad (Sección 09), documentando cómo pasa un robot ya construido a operar en una cuenta real, con las tres piezas pedidas:</p>
+        <ol>
+          <li><strong>Cuenta de XM</strong> — el usuario conecta el robot ya construido a su cuenta de XM (demo o real, a su elección) ingresando sus credenciales, sin salir de MexTradeBot.</li>
+          <li><strong>Test de comportamiento con TickStory</strong> — antes de operar en real, el robot se puede probar contra datos históricos descargados con TickStory, con la misma disciplina de out-of-sample ya documentada en el mapa.</li>
+          <li><strong>MT4 y MT5, a elección del usuario</strong> — el robot se configura con las credenciales de la plataforma que el usuario prefiera; ninguna de las dos es "principal".</li>
+        </ol>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> cierra el hueco entre "el robot ya está construido y validado" y "el robot ya está operando con dinero real" — la pieza de conectividad convierte el mapa en un flujo completo de producto, de principio a fin.</p>
+
+        <h3>2026-08-25 — Programa de desarrollo, GitHub, Vercel y despliegue</h3>
+        <ul>
+          <li><strong>Cambios en el programa de desarrollo:</strong> compatibilidad MT4 y MT5 explícita en la propuesta; prioridad de producto redefinida (competición comunitaria primero, cuentas de fondeo en segundo plano); modelo de negocio propio — Free ($0, construir sin conectar cuentas), Premium ($27 USD/mes, construir + demo + real), Golden ($35 USD/mes, todo lo anterior + robot en producción, clases de agentes de IA, cursos de indicadores) — comunidad MexTradeBot incluida en los tres planes.</li>
+          <li><strong>Apertura de GitHub:</strong> repositorio <code>mextradebot-maker/mextradebot-mapa-tecnico</code> creado y proyecto preparado localmente (constructor visual, validación, README).</li>
+          <li><strong>Apertura de Vercel y despliegue:</strong> team <code>mextradebot-9549</code> registrado, repositorio importado como proyecto estático, deploy completado y confirmado en vivo.</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> el mapa se prepara para presentárselo a XM como propuesta de alianza (broker oficial exclusivo) — de ahí el rebranding, el broker único, y que el modelo de negocio quede reflejado con precisión antes de esa reunión.</p>
+
+        <h3>2026-08-24 — Consolidación del mapa técnico</h3>
+        <p>Investigación de la plataforma de referencia completada (exploración en vivo + 5 videos, +14 horas documentadas), consolidada en un único documento con diseño propio y luego rebrandeada a pedido de Ricardo: "la plataforma base" → MexTradeBot, brokers mencionados → XM, logos incorporados.</p>
+      </section>
+
+      <!-- 11 / footer -->
       <footer id="fuentes">
         <h3 style="margin-top:0;">Fuentes</h3>
         <ol>

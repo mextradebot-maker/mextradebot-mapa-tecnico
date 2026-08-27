@@ -646,6 +646,14 @@
           <div class="box-label">★ Prioridad de producto</div>
           <p><strong>Competición comunitaria primero.</strong> El sistema de torneos con score público (rentabilidad ÷ drawdown) es el motor de crecimiento orgánico más fuerte que vimos en la plataforma base — lo priorizamos en el roadmap de MexTradeBot. Las <a href="#fondeo">cuentas de fondeo</a> quedan incluidas en la propuesta pero en segundo plano: se habilitan una vez la competición y el motor de reglas propio estén maduros, no en la primera versión.</p>
         </div>
+
+        <h3>Conectividad — del robot construido a la cuenta operando</h3>
+        <p>Una vez el usuario termina de construir y validar su robot en el motor propio, el sistema resuelve tres piezas de conectividad antes de que empiece a operar:</p>
+        <ol>
+          <li><strong>Conexión con XM</strong> — el usuario ingresa sus credenciales de XM y conecta el robot a la cuenta que elija, <strong>demo o real</strong>, sin salir de MexTradeBot. Mismo patrón que el Conector documentado en la Sección 01: vinculación directa, sin pasos manuales en la plataforma del broker.</li>
+          <li><strong>Pruebas en histórico con TickStory</strong> — antes de conectar a una cuenta real, el usuario puede correr el robot contra datos históricos descargados con TickStory (ver Sección 05) para comprobar su comportamiento fuera del rango ya validado en el motor propio, con la misma disciplina de out-of-sample documentada en este mapa.</li>
+          <li><strong>MT4 y/o MT5, a elección del usuario</strong> — el robot se configura con las credenciales de la plataforma que el usuario prefiera; ambas quedan soportadas por igual, no hay una plataforma "principal" y otra secundaria.</li>
+        </ol>
       </section>
 
       <!-- 10 / footer -->

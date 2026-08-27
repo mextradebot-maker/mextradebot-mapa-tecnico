@@ -4,6 +4,20 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-08-26
+
+**Diseño de la conectividad**
+
+Se agregó al mapa un capítulo nuevo de Conectividad (Sección 09), documentando cómo pasa un robot ya construido a operar en una cuenta real, con las tres herramientas pedidas:
+
+1. **Cuenta de XM** — el usuario conecta el robot ya construido a su cuenta de XM (demo o real, a su elección) ingresando sus credenciales, sin salir de MexTradeBot.
+2. **Test de comportamiento con TickStory** — antes de operar en real, el robot se puede probar contra datos históricos descargados con TickStory, con la misma disciplina de out-of-sample ya documentada en el mapa.
+3. **MT4 y MT5, a elección del usuario** — el robot se configura con las credenciales de la plataforma que el usuario prefiera; ninguna de las dos es "principal".
+
+**Por qué:** cierra el hueco que quedaba entre "el robot ya está construido y validado" y "el robot ya está operando con dinero real" — la pieza de conectividad es la que convierte el mapa técnico en un flujo completo de producto, de principio a fin.
+
+---
+
 ## 2026-08-25
 
 **Cambios en el programa de desarrollo del mapa**

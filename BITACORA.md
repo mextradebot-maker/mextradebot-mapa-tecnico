@@ -20,6 +20,21 @@ Antes de tocar n8n, se cerró toda la Conectividad (Paso 1b) y el Backtesting fo
 
 ---
 
+## 2026-08-28 (continuación 3)
+
+**T-03 reparado: Claude ahora audita resultados de backtest reales, no solo reenvía datos vacíos**
+
+Tercera workflow de la Serie T reparada — el más profundo de los tres arreglos hasta ahora, con varios bugs reales encontrados en producción, no solo en teoría.
+
+- **Qué hace ahora T-03**: recibe resultados de un backtest por webhook, Claude los audita contra 3 criterios (profit factor, drawdown, win rate), y en el mismo análisis calcula el capital mínimo recomendado para operar el robot y clasifica su nivel de riesgo. Si aprueba, registra el robot en una hoja de cálculo y notifica por Telegram; si rechaza, notifica igual con las razones.
+- **Bug de arquitectura encontrado y corregido, aplicable a cualquier workflow futura**: un tipo de nodo de n8n (el que edita/renombra campos) dejó de aplicar su configuración silenciosamente — el dato pasaba de largo sin transformarse, sin ningún error visible. Se comprobó que el mismo problema ya afectaba a T-01 desde su reparación anterior (el reporte llegaba vacío a Telegram) — queda pendiente corregirlo ahí también. La solución fue reemplazar ese tipo de nodo por uno de código explícito, que sí ejecuta de forma confiable.
+- **Tres comportamientos reales de Claude que había que manejar** (encontrados probando con datos reales, no anticipados de antemano): a veces antepone su razonamiento interno antes de la respuesta y hay que saber distinguirlo del resultado final; si el límite de longitud de respuesta es muy corto, puede agotarlo pensando y nunca llegar a responder; y pese a pedir explícitamente una respuesta sin formato extra, a veces la envuelve en un bloque de código de todos modos. Los tres quedaron resueltos con manejo defensivo.
+- **Verificado en vivo, no solo en simulación**: seis pruebas reales, ambos caminos (aprobado y rechazado), incluyendo el registro real en la hoja de cálculo y la llegada del mensaje completo a Telegram — confirmado por Ricardo.
+
+**Por qué:** el bug del nodo de edición de campos es el hallazgo más importante del día — no es exclusivo de T-03, ya estaba presente (sin detectar) en un workflow que se había dado por resuelto. La disciplina de probar con ejecuciones reales, no solo revisar que la configuración se vea correcta, fue lo que lo sacó a la luz. El detalle técnico completo (nombres de nodos, código exacto, la anatomía de cada bug) vive en el manual técnico interno, no en este mapa público.
+
+---
+
 ## 2026-08-28 (continuación 2)
 
 **T-02 reparado: entrega el robot ya construido, no lo inventa**

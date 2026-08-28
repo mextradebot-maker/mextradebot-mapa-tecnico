@@ -6,6 +6,22 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ## 2026-08-28
 
+**Paso 1b + Backtesting formal completos: 5 piezas construidas y probadas con datos reales**
+
+Antes de tocar n8n, se cerró toda la Conectividad (Paso 1b) y el Backtesting formal — cinco piezas nuevas, cada una validada contra el sistema real (dukascopy, MT5, ForexFactory), no con datos de prueba inventados.
+
+- **Datos históricos** (`conectividad.historico`) — vía `dukascopy-python`. Probado con años reales: 14 años de velas diarias de XAUUSD (2010-2024) bajados en 1.7s, 2 años de H1 (~11,800 velas) en 1.9s. El paquete trae 1,380 instrumentos (forex, commodities, índices, cripto, acciones) — hoy solo XAUUSD y EURUSD están mapeados con nombre corto, cualquier otro se pasa como string crudo.
+- **Conector XM/MT5** (`conectividad.xm`) — conexión, info de cuenta y velas en vivo vía el paquete oficial `MetaTrader5`. Solo lectura a propósito: **envío de órdenes no está incluido**, es un paso aparte que necesita sus propias salvaguardas. Es un puente IPC local (Windows-only) — no puede correr en Vercel, por eso quedó con marcador de plataforma en las dependencias para no romper el build. MT4 sigue sin resolver: el paquete no tiene API oficial para MT4, sería un conector distinto.
+- **Filtro de calendario económico** (`conectividad.calendario`) — feed gratuito de ForexFactory (`nfs.faireconomy.media`), probado en vivo (72 eventos reales de la semana, 9 de impacto Alto). Cachea 1 vez al día, tolera hasta 48h de feed caído antes de desactivarse explícitamente — nunca opera con datos viejos sin avisar.
+- **Backtesting formal** (`backtesting.backtest`) — simulación propia en pandas en vez de Backtrader/VectorBT (los setups son eventos discretos, no una estrategia continua — un framework completo era más de lo necesario). Aplica las 3 reglas de oro de la Sección 05. **Reporte financiero real** sobre XAUUSD H1 2020-2024 (corte 2023): in-sample +0.36R de expectativa (11 setups), out-of-sample plano en 0.0R (3 setups) — exactamente la caída que la disciplina out-of-sample existe para exponer, no un bug.
+- **Endpoint `/api/setups`** (Vercel) — junta las piezas de arriba en un solo request: trae datos históricos y corre el motor completo, para que n8n (o cualquier consumidor externo) pregunte "¿hay setups reales ahora?" sin hablar con dukascopy directo. Se descubrió en el camino que Vercel en modo single-entrypoint no auto-descubre archivos nuevos bajo `api/` como funciones propias — hubo que convertir `api/analizar.py` en router explícito.
+
+**Por qué:** cada pieza se probó con datos/servicios reales antes de darla por terminada (no solo datos sintéticos) — así se encontraron a tiempo el bug del router de Vercel y la columna `volume` que `smc.ob()` exige sin documentarlo. Con esto, todo lo que necesita el pipeline de n8n (Paso 2) ya existe y está verificado.
+
+---
+
+## 2026-08-28 (continuación)
+
 **Paso 2 arranca: T-01 (Detector Activos Rentables) reparado y verificado en vivo**
 
 Primera de las 5 workflows de la Serie T reparada por completo — conectada al motor propio en vez de duplicar lógica, y probada de punta a punta con un envío real de Telegram confirmado por Ricardo, no solo una simulación.

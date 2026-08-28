@@ -680,7 +680,16 @@
         <ol>
           <li><strong>Motor propio de reglas (SMC / Price Action)</strong> — librería en Python que detecta Order Blocks, Fair Value Gaps, liquidez interna/externa y estructura de mercado de forma nativa, construida incrementalmente sobre <code>smartmoneyconcepts</code> (librería abierta que ya implementa estos conceptos, en vez de arrancar de cero) y datos de MT5 vía el paquete oficial <code>MetaTrader5</code>. Backtesting y validación out-of-sample con Backtrader/VectorBT — mismas reglas de oro documentadas en la Sección 05 (nunca optimizar volumen, siempre out-of-sample, nunca partir de un perdedor).</li>
           <li><strong>Conectividad — en paralelo al motor (1b)</strong> — datos históricos vía <code>dukascopy-python</code>/TickVault (reemplaza TickStory), Conector a XM con credenciales del usuario (demo o real, ver Sección 09), soporte dual MT4 y MT5, y el Filtro de <strong>Calendario Económico</strong> alimentado por el feed gratuito de ForexFactory (<code>nfs.faireconomy.media</code>, JSON, sin costo) — se refresca una vez al día respetando el límite de la fuente, con chequeo de última actualización para desactivarse solo si el feed deja de responder, en vez de operar con datos viejos sin avisar.</li>
-          <li><strong>Reparar el pipeline T-01→T-05</strong> — la Serie T de n8n (ver Sección 00) ya prototipa el patrón de "agente de IA que genera y entrega robots" vía Telegram, pero hoy es admin-facing y le falta ejecución real de backtest y conexión real a XM. Se repara conectándolo al motor propio y a la Conectividad ya construidos en los pasos 1 y 1b, en vez de duplicar esa lógica desde cero.</li>
+          <li><strong>Reparar el pipeline T-01→T-05</strong> — la Serie T de n8n (ver Sección 00) ya prototipa el patrón de "agente de IA que genera y entrega robots" vía Telegram, pero hoy es admin-facing y le falta ejecución real de backtest y conexión real a XM. Se repara conectándolo al motor propio y a la Conectividad ya construidos en los pasos 1 y 1b, en vez de duplicar esa lógica desde cero.
+            <div class="table-wrap" style="margin-top:.6rem"><table>
+              <tr><th>Workflow</th><th>Estado</th><th>Nota</th></tr>
+              <tr><td>T-01 Detector Activos Rentables</td><td>✅ Resuelto (28 ago 2026)</td><td>Conectado a <code>/api/setups</code> (motor propio) en vez de Yahoo Finance; probado con envío real de Telegram, no solo simulado.</td></tr>
+              <tr><td>T-02 Generador Robot MT5 Backtesting</td><td>Pendiente</td><td>El más importante — hoy le pide a Claude genérico inventar MQL5 desde cero, sin tocar el motor SMC.</td></tr>
+              <tr><td>T-03 Auditor Backtesting</td><td>Pendiente</td><td>—</td></tr>
+              <tr><td>T-04 Copy Trading Señales</td><td>Pendiente</td><td>—</td></tr>
+              <tr><td>T-05 Monitor Demo MT5</td><td>Pendiente</td><td>Hoy llama a un VPS que no existe; debe conectarse a <code>conectividad.xm</code>.</td></tr>
+            </table></div>
+          </li>
           <li><strong>Exponer la versión cliente-facing</strong> — el mismo patrón de Telegram + IA de la Serie T, ahora de cara al usuario final: construye, prueba y conecta su robot a su cuenta de XM sin salir de la conversación.</li>
           <li><strong>Constructor visual completo (condicional)</strong> — un constructor drag-and-drop tipo la plataforma base solo se evalúa una vez el motor, el pipeline y la cara cliente estén maduros y en uso real. El sistema de competición comunitaria y las cuentas de fondeo (Secciones 08–09) siguen siendo prioridades de esta fase posterior, no de la primera versión.</li>
         </ol>
@@ -704,6 +713,16 @@
       <section id="bitacora">
         <div class="sec-head"><span class="sec-num">11</span><h2>Bitácora</h2></div>
         <p class="sec-dek">Registro de trabajo día por día en este proyecto — qué se hizo, qué se decidió y por qué.</p>
+
+        <h3>2026-08-28 — Paso 2 arranca: T-01 reparado y verificado en vivo</h3>
+        <p>Primera de las 5 workflows de la Serie T reparada por completo — conectada al motor propio en vez de duplicar lógica, y probada de punta a punta con un envío real de Telegram confirmado por Ricardo, no solo una simulación.</p>
+        <ul>
+          <li><strong>Diagnóstico inicial:</strong> las 5 workflows (T-01 a T-05) compartían el mismo bug — un nodo "Extraer [X]" completamente vacío que no extraía nada, dejando roto todo lo que venía después. Ninguna tenía credencial de Telegram vinculada, y todas usaban <code>$env.*</code> para credenciales (que este n8n no soporta).</li>
+          <li><strong>T-01 rediseñada:</strong> reemplaza el llamado muerto a Yahoo Finance + opinión genérica de Claude por el motor real — llama a <code>/api/setups</code> (endpoint nuevo de <code>tradebotbuilder</code>) para XAUUSD y EURUSD; Claude solo redacta el reporte con los datos reales del motor SMC, sin decidir nada por su cuenta.</li>
+          <li><strong>Cadena de bugs reales</strong> encontrados al probarlo en vivo (cada uno tronó una ejecución real antes de arreglarse): restricción de dominio en la credencial de Anthropic bloqueando nodos HTTP genéricos; una API key "identity-linked" que exigía un <code>workspace-id</code> en vez de una key de workspace específico; el campo "Name" de la credencial de header mal llenado; el JSON armado a mano con comillas incrustadas rompiéndose con datos reales (corregido construyendo el body como objeto en un nodo Code); y el modelo <code>claude-sonnet-4-20250514</code> retirado, reemplazado por <code>claude-sonnet-5</code>.</li>
+          <li><strong>Bot dedicado:</strong> se creó <code>mxtrading_robot</code> en BotFather y su credencial en n8n, en vez de reusar un bot genérico de otro proyecto — el chat_id real se obtuvo con un workflow temporal desechable (<code>telegramTrigger</code> publicado, capturó el mensaje real, luego se archivó).</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> cada arreglo se probó contra el sistema real (Anthropic, Telegram, el motor propio) en vez de darlo por bueno con lógica simulada — varios de estos bugs (la restricción de dominio, el workspace de la API key, el nombre del header) solo aparecen al ejecutar de verdad, nunca se habrían visto revisando el JSON del workflow. T-01 queda como la plantilla del proceso para reparar T-02 a T-05.</p>
 
         <h3>2026-08-27 — Plan de construcción definido: primer paso de estructura</h3>
         <p>Cerramos la fase de definición del sistema propio y quedó documentada en la nueva <a href="#plan-construccion">Sección 10 (Plan de construcción)</a>. Resumen de lo investigado, debatido y definido:</p>

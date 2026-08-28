@@ -4,6 +4,36 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-08-28
+
+**Paso 2 arranca: T-01 (Detector Activos Rentables) reparado y verificado en vivo**
+
+Primera de las 5 workflows de la Serie T reparada por completo — conectada al motor propio en vez de duplicar lógica, y probada de punta a punta con un envío real de Telegram confirmado por Ricardo, no solo una simulación.
+
+- **Diagnóstico inicial**: las 5 workflows (T-01 a T-05) compartían el mismo bug — un nodo "Extraer [X]" completamente vacío que no extraía nada, dejando roto todo lo que venía después. Además, ninguna tenía credencial de Telegram vinculada, y todas usaban `$env.*` para credenciales (que este n8n no soporta).
+- **T-01 rediseñada**: reemplaza el llamado muerto a Yahoo Finance + opinión genérica de Claude por el motor real — llama a `/api/setups` (el endpoint nuevo de `tradebotbuilder`) para XAUUSD y EURUSD, y Claude solo redacta el reporte con los datos reales que ya vienen del motor SMC, sin decidir nada por su cuenta.
+- **Cadena de bugs reales encontrados al probarlo en vivo** (no en teoría — cada uno tronó una ejecución real antes de arreglarse): restricción de dominio en la credencial de Anthropic bloqueando su uso en nodos HTTP genéricos; una API key "identity-linked" que exigía un `workspace-id` en vez de una key de un workspace específico; el campo "Name" de la credencial de header mal llenado (mandaba el header equivocado); el JSON armado a mano con comillas incrustadas rompiéndose con datos reales (se corrigió construyendo el body como objeto en un nodo Code, no concatenando strings); y el modelo `claude-sonnet-4-20250514` retirado, reemplazado por `claude-sonnet-5`.
+- **Bot dedicado**: se creó `mxtrading_robot` en BotFather y su credencial en n8n, en vez de reusar un bot genérico de otro proyecto — el chat_id real (`943121056`) se obtuvo con un workflow temporal desechable (`telegramTrigger` publicado, capturó el mensaje real, luego se archivó).
+- **Verificación**: `execute_workflow` en modo manual, ejecución real (no pin data) de punta a punta — el reporte llegó de verdad al Telegram de Ricardo, confirmado por él.
+
+**Por qué:** cada arreglo se probó contra el sistema real (Anthropic, Telegram, el motor propio) en vez de darlo por bueno con la lógica simulada — varios de estos bugs (la restricción de dominio, el workspace de la API key, el nombre del header) solo aparecen al ejecutar de verdad, nunca se habrían visto revisando el JSON del workflow. T-01 queda como la plantilla del proceso para reparar T-02 a T-05.
+
+---
+
+## 2026-08-27 (continuación)
+
+**Arranca el Paso 1: motor propio SMC (código)**
+
+Primer código real del sistema, en `codigo/motor_smc/` (venv local, `smartmoneyconcepts` + pandas):
+
+- `motor.py` — envoltorio de detección nativa (`analizar()`): swings, FVG, order blocks, estructura (BOS/CHoCH) y liquidez, directo sobre `smartmoneyconcepts`. Sin reimplementar la detección, tal como se decidió en el Plan de construcción.
+- `setup_ob_fvg.py` — primera regla concreta encima de esa detección: opera­cionaliza el setup insignia de la metodología (`docs/metodologia-trading.md` §7.4, "cacería de liquidez + MSB + FVG"). Un CHoCH confirmado por `bos_choch` ya exige por construcción que el swing previo haya sido barrido, así que la fila del CHoCH es la vela de barrido; se busca el primer FVG del mismo signo en una ventana corta después de esa vela (no atada al índice de confirmación, que puede quedar muy lejos) y la entrada queda en el punto medio del FVG, el stop en el extremo de la vela de barrido.
+- Al escribir el self-check se encontró y corrigió un bug real: el candidato de FVG se buscaba en una ventana demasiado amplia (hasta el índice de confirmación de estructura, que puede estar 30+ velas después del barrido) y podía devolver un FVG de un movimiento posterior no relacionado, con el stop del lado equivocado de la entrada. Se acotó la ventana al barrido + N velas y se agregó un filtro de geometría que descarta cualquier candidato inválido en vez de reportarlo.
+
+**Por qué:** valida que la librería (`smartmoneyconcepts`) resuelve lo que el plan asumía que resolvía, y deja el primer setup de la metodología operacionalizado de punta a punta (detección → regla → señal con entrada/stop) antes de sumar conectividad real o backtesting formal — ambos quedan pendientes, documentados en `codigo/README.md`.
+
+---
+
 ## 2026-08-27
 
 **Plan de construcción definido: primer paso de estructura**

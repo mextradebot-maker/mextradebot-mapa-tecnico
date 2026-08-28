@@ -20,6 +20,20 @@ Antes de tocar n8n, se cerró toda la Conectividad (Paso 1b) y el Backtesting fo
 
 ---
 
+## 2026-08-28 (continuación 4)
+
+**Cierra la Serie T: T-01 corregido de verdad, T-04 rediseñada y en producción, T-05 reparado (bloqueado por infraestructura)**
+
+Última tanda del día — cierra la primera pasada completa de reparación de las 5 workflows de la Serie T.
+
+- **T-01 corregido de verdad**: el bug del nodo de edición de campos encontrado ayer en T-03 también rompía T-01, que se había marcado como resuelto sin haberlo verificado a fondo. Ya corregido y confirmado con una ejecución real — el reporte completo llega a Telegram.
+- **T-04 rediseñada por completo, dos veces, a petición de Ricardo**: el diseño original (transmitir señales de trading a un grupo) se descartó por completo. Ahora es un flujo conversacional dentro de Telegram (`/Robot`) que entrega robots ya construidos y con backtest real, no señales. El usuario elige símbolo, temporalidad y riesgo con botones; si elige temporalidad "swing" y el activo no está en tendencia alcista en ese momento, se le avisa y se le ofrecen alternativas — nunca se le vende una operación swing en contra de la tendencia. Antes de entregar el robot, el sistema avisa el momento actual del mercado y corre un backtest real de esa dirección específica. Ya está en producción, probado en vivo con datos reales.
+- **T-05 reparado en la parte que depende de nosotros**: la lógica de evaluación (Claude + extracción + notificación) quedó corregida y verificada. Pero el monitoreo de la cuenta demo real de MT5 sigue bloqueado — se necesita un servidor Windows con la terminal MT5 corriendo, y el único servidor disponible hoy es Linux. Queda documentado como pendiente de infraestructura, no de código.
+
+**Por qué:** con esto las 5 workflows de la Serie T pasaron por una revisión real, con ejecuciones reales, no solo una revisión de que la configuración se viera correcta — que es exactamente el patrón que expuso el bug de T-01. El detalle técnico completo (arquitectura de T-04, la regla de negocio del swing trading, el bloqueo de infraestructura de T-05) vive en el manual técnico interno, no en este mapa público.
+
+---
+
 ## 2026-08-28 (continuación 3)
 
 **T-03 reparado: Claude ahora audita resultados de backtest reales, no solo reenvía datos vacíos**

@@ -4,6 +4,25 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-08-27
+
+**Plan de construcción definido: primer paso de estructura**
+
+Cerramos la fase de definición del sistema propio. Quedó documentada como una sección nueva y visible en el sitio (Sección 10, "Plan de construcción"), con el paso a paso completo y una tabla de qué herramienta de la plataforma base reemplaza cada pieza propia.
+
+Lo investigado, debatido y definido:
+
+1. **Tres formas de generar y entregar robots** evaluadas a fondo — el sistema planeado desde cero, los flujos ya existentes de n8n (Serie T), o agentes especialistas por Telegram conectados a XM. Se concluyó que el motor propio va primero, no el pipeline ni la cara cliente: sin motor propio (Order Blocks, FVG, liquidez), lo que recibe el cliente se puede leer como "señales" en vez de algo construido y verificable.
+2. **Motor propio investigado y validado, no desde cero**: paquete oficial `MetaTrader5` (Python↔MT5), librería abierta `smartmoneyconcepts` como acelerador de Order Blocks/FVG/liquidez, Backtrader/VectorBT para backtesting con disciplina out-of-sample, `dukascopy-python` para datos históricos directos.
+3. **TickStory y QuantAnalyzer reemplazados** por sus equivalentes nativos en Python — la disciplina que enseñan (out-of-sample, correlación de carteras) se queda, la herramienta específica no.
+4. **Calendario económico resuelto a costo cero**: ForexFactory no tiene API oficial, pero sí un feed gratuito documentado (`nfs.faireconomy.media`, JSON) usado desde hace años por la comunidad de EAs de MT4/5 — se adopta con control de frecuencia (máx. 2 descargas/5min según el proveedor, se refresca 1 vez al día) y chequeo de última actualización para que no falle en silencio.
+5. **Se descartó mezclar noticias editoriales con el motor de reglas** — un resumen de noticias generado por IA no es reproducible en backtest; si se construye, queda como producto de contenido aparte (mismo patrón que `generador_de_contenido`), nunca como señal de entrada del robot.
+6. **Secuencia de construcción final**: Motor propio → Conectividad en paralelo (datos históricos, Conector XM, MT4/MT5, Filtro de calendario económico) → reparar pipeline T-01→T-05 → exponer versión cliente-facing por Telegram → constructor visual completo, condicional a que las etapas anteriores estén maduras y en uso real.
+
+**Por qué documentamos esto como "primer paso de estructura":** hasta hoy todo era investigación y debate — con la Sección 10 escrita, el proyecto pasa de "sabemos qué plataforma estudiamos" a "sabemos, en orden, qué construimos primero y por qué". Es la bisagra entre la fase de definición y la fase de construcción real.
+
+---
+
 ## 2026-08-26
 
 **Diseño de la conectividad**

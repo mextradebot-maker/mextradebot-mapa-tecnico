@@ -333,8 +333,9 @@
       <li><a href="#ia"><span class="num">07</span>IA aplicada</a></li>
       <li><a href="#fondeo"><span class="num">08</span>Cuentas de fondeo</a></li>
       <li><a href="#hallazgo"><span class="num">09</span>El hallazgo clave</a></li>
-      <li><a href="#bitacora"><span class="num">10</span>Bitácora</a></li>
-      <li><a href="#fuentes"><span class="num">11</span>Fuentes</a></li>
+      <li><a href="#plan-construccion"><span class="num">10</span>Plan de construcción</a></li>
+      <li><a href="#bitacora"><span class="num">11</span>Bitácora</a></li>
+      <li><a href="#fuentes"><span class="num">12</span>Fuentes</a></li>
     </ul>
     <div class="toc-group">MexTradeBot</div>
     <ul class="toc">
@@ -658,9 +659,63 @@
       </section>
 
       <!-- 10 -->
+      <section id="plan-construccion">
+        <div class="sec-head"><span class="sec-num">10</span><h2>Plan de construcción</h2></div>
+        <p class="sec-dek">La secuencia definida para pasar de este mapa técnico a un sistema operando con XM — qué se construye primero, en qué orden, y por qué.</p>
+
+        <div class="pipeline">
+          <span class="step">1 · Motor propio SMC</span><span class="arrow">→</span>
+          <span class="step">1b · Conectividad (en paralelo)</span><span class="arrow">→</span>
+          <span class="step">2 · Reparar T-01→T-05</span><span class="arrow">→</span>
+          <span class="step">3 · Cliente-facing (Telegram)</span><span class="arrow">→</span>
+          <span class="step">4 · Constructor visual</span>
+        </div>
+
+        <div class="box finding">
+          <div class="box-label">★ Por qué el motor propio va primero</div>
+          <p>Se evaluaron tres formas de generar y entregar robots: el sistema planeado desde cero, los flujos de n8n ya existentes (Serie T), o agentes especialistas por Telegram conectados a XM. Los tres tienen mérito, pero se descartó empezar por el pipeline de n8n o por el cliente-facing: sin el motor propio (Order Blocks, FVG, liquidez) construido primero, lo que recibe el cliente se puede leer como "señales" en vez de algo construido y verificable — rompe la confianza que sí transmite un sistema con robot propio, backtest propio y conector propio. El conocimiento de trading ya dominado (Sección 00) se aplica primero en el motor, y de ahí se aprovecha en todo lo demás.</p>
+        </div>
+
+        <h3>Paso a paso</h3>
+        <ol>
+          <li><strong>Motor propio de reglas (SMC / Price Action)</strong> — librería en Python que detecta Order Blocks, Fair Value Gaps, liquidez interna/externa y estructura de mercado de forma nativa, construida incrementalmente sobre <code>smartmoneyconcepts</code> (librería abierta que ya implementa estos conceptos, en vez de arrancar de cero) y datos de MT5 vía el paquete oficial <code>MetaTrader5</code>. Backtesting y validación out-of-sample con Backtrader/VectorBT — mismas reglas de oro documentadas en la Sección 05 (nunca optimizar volumen, siempre out-of-sample, nunca partir de un perdedor).</li>
+          <li><strong>Conectividad — en paralelo al motor (1b)</strong> — datos históricos vía <code>dukascopy-python</code>/TickVault (reemplaza TickStory), Conector a XM con credenciales del usuario (demo o real, ver Sección 09), soporte dual MT4 y MT5, y el Filtro de <strong>Calendario Económico</strong> alimentado por el feed gratuito de ForexFactory (<code>nfs.faireconomy.media</code>, JSON, sin costo) — se refresca una vez al día respetando el límite de la fuente, con chequeo de última actualización para desactivarse solo si el feed deja de responder, en vez de operar con datos viejos sin avisar.</li>
+          <li><strong>Reparar el pipeline T-01→T-05</strong> — la Serie T de n8n (ver Sección 00) ya prototipa el patrón de "agente de IA que genera y entrega robots" vía Telegram, pero hoy es admin-facing y le falta ejecución real de backtest y conexión real a XM. Se repara conectándolo al motor propio y a la Conectividad ya construidos en los pasos 1 y 1b, en vez de duplicar esa lógica desde cero.</li>
+          <li><strong>Exponer la versión cliente-facing</strong> — el mismo patrón de Telegram + IA de la Serie T, ahora de cara al usuario final: construye, prueba y conecta su robot a su cuenta de XM sin salir de la conversación.</li>
+          <li><strong>Constructor visual completo (condicional)</strong> — un constructor drag-and-drop tipo la plataforma base solo se evalúa una vez el motor, el pipeline y la cara cliente estén maduros y en uso real. El sistema de competición comunitaria y las cuentas de fondeo (Secciones 08–09) siguen siendo prioridades de esta fase posterior, no de la primera versión.</li>
+        </ol>
+
+        <h3>Qué reemplaza a qué</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Herramienta de la plataforma base</th><th>Reemplazo en MexTradeBot</th><th>Por qué</th></tr>
+          <tr><td>TickStory (datos históricos)</td><td><code>dukascopy-python</code> / TickVault</td><td>Pipeline directo a Python, sin exportar/importar manual a MT4.</td></tr>
+          <tr><td>QuantAnalyzer (backtest y carteras)</td><td>Backtrader / VectorBT, nativo</td><td>Misma disciplina de out-of-sample y correlación, sin depender de una foto estática externa.</td></tr>
+          <tr><td>Indicadores clásicos como base de estrategia</td><td><code>smartmoneyconcepts</code> (Python)</td><td>Ya implementa Order Blocks, FVG, liquidez, BOS/CHoCH — el vocabulario real de nuestra metodología.</td></tr>
+          <tr><td>Calendario económico (sin fuente definida)</td><td>Feed gratuito ForexFactory / Fair Economy</td><td>Dato oficial, JSON, sin costo — ver hallazgo abajo.</td></tr>
+        </table></div>
+
+        <div class="box gotcha">
+          <div class="box-label">⚠ Dato duro vs. contexto humano — no mezclar</div>
+          <p>Se evaluaron dos fuentes de "noticias" (ForexFactory y un sitio editorial de cripto) para dar contexto de mercado. Conclusión: el <strong>calendario económico</strong> es dato estructurado y determinista — entra al motor como Filtro, respaldable en backtest. Un <strong>resumen de noticias generado por IA</strong> no es reproducible en histórico, así que no puede ser parte de una regla del robot; si se construye, es un producto de contenido aparte (mismo patrón que <code>generador_de_contenido</code>), nunca una señal de entrada. Mezclarlos abre la puerta a que el motor deje de ser determinista.</p>
+        </div>
+      </section>
+
+      <!-- 11 -->
       <section id="bitacora">
-        <div class="sec-head"><span class="sec-num">10</span><h2>Bitácora</h2></div>
+        <div class="sec-head"><span class="sec-num">11</span><h2>Bitácora</h2></div>
         <p class="sec-dek">Registro de trabajo día por día en este proyecto — qué se hizo, qué se decidió y por qué.</p>
+
+        <h3>2026-08-27 — Plan de construcción definido: primer paso de estructura</h3>
+        <p>Cerramos la fase de definición del sistema propio y quedó documentada en la nueva <a href="#plan-construccion">Sección 10 (Plan de construcción)</a>. Resumen de lo investigado, debatido y definido:</p>
+        <ul>
+          <li><strong>Tres formas de generar y entregar robots</strong> evaluadas a fondo (sistema planeado desde cero, flujos ya existentes de n8n, agentes por Telegram) — se concluyó que el motor propio va primero, no el pipeline ni el cliente-facing, por el argumento de confianza: un robot construido y verificable pesa más que algo que se pueda leer como "señales".</li>
+          <li><strong>Motor propio investigado y validado</strong>: no se construye desde cero — <code>MetaTrader5</code> (paquete oficial) para conectividad Python↔MT5, <code>smartmoneyconcepts</code> como acelerador de Order Blocks/FVG/liquidez, Backtrader/VectorBT para backtesting con disciplina out-of-sample, <code>dukascopy-python</code> para datos históricos directos.</li>
+          <li><strong>TickStory y QuantAnalyzer</strong> quedan reemplazados por sus equivalentes nativos en Python — la disciplina que enseñan (out-of-sample, correlación de carteras) se queda, la herramienta específica no.</li>
+          <li><strong>Fuente de calendario económico resuelta a costo cero</strong>: ForexFactory no tiene API oficial, pero sí un feed gratuito documentado (<code>nfs.faireconomy.media</code>, JSON) usado desde hace años por la comunidad de EAs de MT4/5 — se adopta con control de frecuencia y chequeo de última actualización para que no falle en silencio.</li>
+          <li><strong>Se descartó mezclar noticias editoriales (ej. sitios de cripto) con el motor de reglas</strong> — un resumen de noticias generado por IA no es reproducible en backtest, así que si se construye queda como producto de contenido aparte, nunca como señal de entrada del robot.</li>
+          <li><strong>Secuencia de construcción final</strong>: Motor propio → Conectividad en paralelo (datos, XM, MT4/MT5, calendario) → reparar pipeline T-01→T-05 → exponer versión cliente-facing → constructor visual completo, condicional a que las etapas anteriores estén maduras.</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué documentamos esto como "primer paso de estructura":</strong> hasta hoy todo era investigación y debate — con la Sección 10 escrita, el proyecto pasa de "sabemos qué plataforma estudiamos" a "sabemos, en orden, qué construimos primero y por qué". Es la bisagra entre la fase de definición y la fase de construcción real.</p>
 
         <h3>2026-08-26 — Diseño de la conectividad</h3>
         <p>Se agregó el capítulo de Conectividad (Sección 09), documentando cómo pasa un robot ya construido a operar en una cuenta real, con las tres piezas pedidas:</p>

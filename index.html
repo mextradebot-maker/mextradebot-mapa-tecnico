@@ -698,7 +698,7 @@
             <div class="table-wrap" style="margin-top:.6rem"><table>
               <tr><th>Workflow</th><th>Estado</th><th>Nota</th></tr>
               <tr><td>T-01 Detector Activos Rentables</td><td>✅ Resuelto (28 ago 2026)</td><td>Conectado a <code>/api/setups</code> (motor propio) en vez de Yahoo Finance; probado con envío real de Telegram, no solo simulado.</td></tr>
-              <tr><td>T-02 Generador Robot MT5 Backtesting</td><td>Pendiente</td><td>El más importante — hoy le pide a Claude genérico inventar MQL5 desde cero, sin tocar el motor SMC.</td></tr>
+              <tr><td>T-02 Generador Robot MT5 Backtesting</td><td>✅ Resuelto (28 ago 2026)</td><td>Ya no genera MQL5 con IA cada vez — entrega un EA fijo ya construido y validado (<code>MexTradeBot_SeguidorSMC.mq5</code>) que consulta <code>/api/setups</code> en cada vela, sin reimplementar el motor en MQL5. Probado con envío real de Telegram.</td></tr>
               <tr><td>T-03 Auditor Backtesting</td><td>Pendiente</td><td>—</td></tr>
               <tr><td>T-04 Copy Trading Señales</td><td>Pendiente</td><td>—</td></tr>
               <tr><td>T-05 Monitor Demo MT5</td><td>Pendiente</td><td>Hoy llama a un VPS que no existe; debe conectarse a <code>conectividad.xm</code>.</td></tr>
@@ -738,6 +738,16 @@
           <li><strong>Endpoint <code>/api/setups</code></strong> (Vercel) — junta las piezas de arriba en un solo request para que n8n pregunte "¿hay setups reales ahora?" sin hablar con dukascopy directo. Se descubrió que Vercel en modo single-entrypoint no auto-descubre archivos nuevos bajo <code>api/</code> — hubo que convertir <code>api/analizar.py</code> en router explícito.</li>
         </ul>
         <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> cada pieza se probó con datos/servicios reales antes de darla por terminada — así se encontraron a tiempo el bug del router de Vercel y la columna <code>volume</code> que <code>smc.ob()</code> exige sin documentarlo. Con esto, todo lo que necesita el pipeline de n8n (Paso 2) ya existe y está verificado.</p>
+
+        <h3>2026-08-28 (continuación 2) — T-02 reparado: entrega el robot ya construido, no lo inventa</h3>
+        <p>Segunda workflow de la Serie T reparada, y la más importante de las 5 — hasta hoy le pedía a Claude genérico que inventara un Expert Advisor en MQL5 desde cero (indicadores clásicos) y lo mandaba a un VPS de compilación que nunca se construyó.</p>
+        <ul>
+          <li><strong>Decisión de arquitectura confirmada con Ricardo:</strong> el EA no reimplementa Order Blocks/FVG/liquidez en MQL5 — consulta <code>/api/setups</code> (el motor Python ya validado) en cada vela nueva vía <code>WebRequest</code>, y opera exactamente lo que responda. Cualquier mejora al motor se refleja en todos los robots ya entregados sin tocar el archivo. La alternativa (un EA 100% independiente del servidor, con SMC traducido a MQL5) quedó evaluada y descartada por ahora — es una segunda implementación completa del motor, con riesgo de que las dos versiones diverjan.</li>
+          <li><strong>Orden pendiente, no orden de mercado:</strong> el EA coloca una orden límite en el punto medio del FVG (esperando que el precio regrese, como describe la metodología), con SL en la vela de barrido y TP fijo a 2R — el mismo múltiplo ya validado en el backtest, para que el resultado en vivo sea comparable. Sin break-even ni trailing a propósito: cambiaría el comportamiento respecto a lo ya probado.</li>
+          <li><strong>T-02 rediseñada:</strong> Webhook → descarga el <code>.mq5</code> ya construido directo de GitHub (repo público, sin credenciales) → lo entrega por Telegram como documento, con instrucciones de instalación. Sin IA de por medio — no hace falta para repartir un archivo fijo.</li>
+          <li><strong>Bug real encontrado y corregido durante la prueba:</strong> una referencia cruzada entre nodos de n8n (<code>$('NombreNodo')</code>) devolvía los datos del nodo equivocado en el modo de prueba simulado — sin error, solo el valor mal. Se corrigió referenciando el nodo disparador directo, y de paso se eliminó un nodo intermedio que ya no hacía falta.</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> la decisión de no reimplementar SMC en MQL5 sigue el mismo principio que ya gobierna todo el proyecto — nunca duplicar lógica que ya existe y está validada. La documentación completa de esta decisión (y las alternativas evaluadas) vive en un manual técnico interno, no en este mapa público.</p>
 
         <h3>2026-08-28 (continuación) — Paso 2 arranca: T-01 reparado y verificado en vivo</h3>
         <p>Primera de las 5 workflows de la Serie T reparada por completo — conectada al motor propio en vez de duplicar lógica, y probada de punta a punta con un envío real de Telegram confirmado por Ricardo, no solo una simulación.</p>

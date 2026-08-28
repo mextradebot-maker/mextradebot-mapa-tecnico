@@ -20,6 +20,21 @@ Antes de tocar n8n, se cerró toda la Conectividad (Paso 1b) y el Backtesting fo
 
 ---
 
+## 2026-08-28 (continuación 2)
+
+**T-02 reparado: entrega el robot ya construido, no lo inventa**
+
+Segunda workflow de la Serie T reparada, y la más importante de las 5 — hasta hoy le pedía a Claude genérico que inventara un Expert Advisor en MQL5 desde cero (indicadores clásicos) y lo mandaba a un VPS de compilación que nunca se construyó.
+
+- **Decisión de arquitectura confirmada con Ricardo**: el EA no reimplementa Order Blocks/FVG/liquidez en MQL5 — consulta `/api/setups` (el motor Python ya validado) en cada vela nueva vía `WebRequest`, y opera exactamente lo que responda. Cualquier mejora al motor se refleja en todos los robots ya entregados sin tocar el archivo. La alternativa (un EA 100% independiente del servidor) quedó evaluada y descartada por ahora — es una segunda implementación completa del motor, con riesgo de que las dos versiones diverjan.
+- **Orden pendiente, no orden de mercado**: coloca una orden límite en el punto medio del FVG, SL en la vela de barrido, TP fijo a 2R — el mismo múltiplo ya validado en el backtest. Sin break-even ni trailing a propósito, para que el resultado en vivo sea comparable al backtest.
+- **T-02 rediseñada**: Webhook → descarga el `.mq5` ya construido directo de GitHub (repo público, sin credenciales) → lo entrega por Telegram como documento con instrucciones. Sin IA de por medio.
+- **Bug real encontrado y corregido durante la prueba**: una referencia cruzada entre nodos de n8n (`$('NombreNodo')`) devolvía los datos del nodo equivocado en el modo de prueba simulado, sin error visible. Se corrigió referenciando el nodo disparador directo, y se eliminó un nodo intermedio que ya no hacía falta.
+
+**Por qué:** la decisión de no reimplementar SMC en MQL5 sigue el mismo principio que ya gobierna todo el proyecto — nunca duplicar lógica que ya existe y está validada. La documentación completa de esta decisión (y las alternativas evaluadas) vive en un manual técnico interno aparte, no en este mapa público.
+
+---
+
 ## 2026-08-28 (continuación)
 
 **Paso 2 arranca: T-01 (Detector Activos Rentables) reparado y verificado en vivo**

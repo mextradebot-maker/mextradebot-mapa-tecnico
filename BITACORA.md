@@ -20,6 +20,18 @@ Antes de tocar n8n, se cerró toda la Conectividad (Paso 1b) y el Backtesting fo
 
 ---
 
+## 2026-08-28 (continuación 5)
+
+**Búsqueda de VPS Windows para T-05 — resuelta por la vía correcta, en espera**
+
+Cierre corto del día: se evaluaron varias opciones para el VPS Windows que necesita T-05 (Azure free tier, un proveedor especializado en VPS para trading, el propio VPS de XM). Cada una tuvo su propia fricción — cuentas nuevas de Azure con cuotas restringidas, un proveedor que pedía tarjeta pese a anunciarse como gratis sin tarjeta, la interfaz nueva de XM sin el botón de VPS visible a simple vista.
+
+La resuelve la vía correcta: Ricardo es afiliado de XM, y por ese patrocinio le corresponde VPS gratis — el trámite ya quedó enviado con el equipo correspondiente de XM, en espera de respuesta. Se decidió no seguir forzando alternativas peores solo por prisa — T-05 no bloquea nada más del sistema, así que esperar la vía gratuita confirmada es lo correcto.
+
+**Por qué:** vale más documentar honestamente una búsqueda que no cerró hoy que forzar una solución de peor calidad solo para marcar la tarea como completa. El detalle completo de cada opción evaluada vive en el manual técnico interno.
+
+---
+
 ## 2026-08-28 (continuación 4)
 
 **Cierra la Serie T: T-01 corregido de verdad, T-04 rediseñada y en producción, T-05 reparado (bloqueado por infraestructura)**

@@ -4,6 +4,57 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-09-13
+
+**T-05 queda expuesto a internet de verdad (dominio + túnel + servicio), EA pegado a un chart real con AutoTrading activo, y T-04 gana autenticación mínima**
+
+- **Dominio propio para el proyecto**: se compró `mextradebot.com.mx` y se dio de alta en Cloudflare (gratis) — su DNS se movió ahí sin tocar el hosting de Neubox donde se compró, que sigue disponible para cuando se configure el sitio.
+- **El "VPS provisional" (la propia PC) ya es alcanzable desde internet, sin abrir ningún puerto del router**: se instaló Cloudflare Tunnel como servicio de Windows (arranca solo, sobrevive reinicios igual que la Tarea Programada de MT5) y se publicó `https://demo-status.mextradebot.com.mx` apuntando al servidor local de T-05. El servidor mismo (`servidor_local.py`) también quedó con su propia Tarea Programada para arrancar solo al iniciar sesión. Probado de punta a punta con una consulta real desde fuera de la red — respondió con datos reales de la cuenta demo.
+- **T-05 conectado en n8n a esa URL real** (ya no al placeholder "no existe VPS Windows"). Al correrlo real por primera vez, el nodo que trae los datos de MT5 funcionó perfecto — el eslabón que le seguía (Claude evaluando esos datos) se detuvo por falta de saldo en la cuenta de Anthropic usada ahí, algo de facturación externo, no del flujo en sí. Queda pendiente repetir la prueba completa una vez recargado ese saldo.
+- **El EA (`MexTradeBot_SeguidorSMC.mq5`) se pegó por primera vez a un chart real** (GOLD, H1) con AutoTrading activado, documentando el proceso en vivo. Se confirmó el mismo aviso que ya predecía el manual del EA (falta autorizar la URL de la API en las opciones de MT5) y, además, se encontró y corrigió un bug real: el tiempo de espera de la consulta a la API (5 segundos) se quedaba corto cuando esa función pasa un rato sin usarse y tarda en "despertar" — se subió a 15 segundos y ya quedó publicado en el mismo archivo que reciben los alumnos.
+- **T-04 (el webhook web para el futuro Panel de Alumnos) ya exige un código para usarse**, en vez de estar abierto a cualquiera que encontrara la URL — un candado sencillo mientras no existe todavía un sistema de acceso por alumno.
+
+**Por qué:** T-05 llevaba semanas con el código listo pero bloqueado por no tener dónde correr el monitoreo de MT5 — con dominio propio y un túnel gratuito, la propia PC de Ricardo ya cumple ese papel de forma real y verificable, no solo en teoría, mientras se resuelve el VPS gratuito de XM. El bug del EA (timeout corto) es el tipo de falla que solo aparece usando el sistema en vivo, no revisando el código en papel — por eso vale la pena seguir probando cada pieza contra el sistema real antes de darla por buena. Detalle técnico completo (nameservers, nombre del túnel, comandos exactos) vive en `docs/manual-tecnico-interno.md`, no aquí.
+
+---
+
+## 2026-09-12 (continuación)
+
+**T-04 con canal web publicado; arranca la preparación de T-05 — tu propia PC funcionando como "VPS" provisional, probado con reinicios reales**
+
+- **T-04 ahora sirve por dos canales**: el mismo catálogo/creación de robots que ya existía en Telegram, ahora también disponible por un webhook nuevo para el Panel de Alumnos. Se extendió el nodo clasificador existente en vez de duplicarlo (duplicarlo rompía las referencias cruzadas de n8n entre Telegram y web) — mismo catálogo, mismas reglas de negocio, sin repetir lógica. Se encontró y corrigió un bug real antes de publicar: la regla de "no permitir robot Swing si la tendencia es bajista" se podía saltar mandando `"swing"` en minúsculas desde el canal web. Ya publicado en producción.
+- **QuantAnalyzer investigado para T-05, descartado para uso automático**: es una herramienta de foto estática de un backtest ya hecho, sin conexión en vivo — sirve para análisis manual más adelante, no para la evaluación automática cada 6 horas que necesita T-05. La fuente correcta es el historial de operaciones que MT5 ya trae (`mt5.history_deals_get()`), consultado en vivo.
+- **Se confirmó que el robot (`MexTradeBot_SeguidorSMC.mq5`) ya sobrevive reinicios sin cambiarle nada** — no guarda ningún estado propio, siempre revisa si ya hay algo abierto antes de operar, y el stop/take-profit viven en el servidor del broker, no en la terminal. Reinicio → retoma solo, preguntando de nuevo cuál es la mejor tendencia actual — exactamente el comportamiento que se buscaba.
+- **Se armó y probó de verdad (con 3 reinicios reales) la cadena para que tu PC aguante reinicios sin que nadie esté presente**: inicio de sesión automático de Windows (Sysinternals Autologon, lo corrió Ricardo mismo — es un cambio de seguridad que no le corresponde a la IA), una tarea programada que abre MT5 solo al iniciar sesión, y un ajuste de permisos de administrador en esa tarea para que no se quede esperando el aviso de "¿permitir cambios?" que nadie puede aprobar en un reinicio desatendido. El primer intento (acceso directo en la carpeta de Inicio) no funcionó — se reemplazó por una tarea programada de verdad, más confiable y con historial de diagnóstico.
+- **Pendiente, a propósito**: falta poner el EA en la gráfica y activar el trading automático (Ricardo lo quiere documentar con capturas antes de hacerlo, como los manuales anteriores) y construir la pieza real de T-05 (el mini-servidor local que exponga el historial de MT5 para que n8n lo consulte) — todo lo de hoy fue la base de infraestructura, no T-05 en sí.
+
+**Por qué:** sin un VPS de verdad todavía, la propia PC de Ricardo tiene que aguantar el mismo trabajo — pero solo sirve si sobrevive sus reinicios frecuentes sin intervención humana. Probarlo con reinicios reales (no solo en teoría) fue lo que expuso los dos bloqueos reales (el acceso directo no confiable, y el aviso de permisos de administrador) — ninguno se habría visto solo revisando la configuración.
+
+---
+
+## 2026-09-09 (continuación)
+
+**Cuenta demo nueva creada de punta a punta, conexión real a MT5/XM verificada por fin, y arranca el manual visual para alumnos**
+
+- **Cuenta demo XM nueva**: la anterior (`99967235`) seguía muerta (ver entrada de abajo). Se creó una cuenta demo nueva (`318680674`, servidor `XMGlobal-MT5 7`, tipo Standard, balance inicial $10,000 USD) siguiendo el flujo real de registro con el link de afiliado de Ricardo (`affs.click/Ahf2k` + código `HDY28`) — todo el proceso quedó documentado paso a paso con capturas reales (ver punto del manual, abajo).
+- **Conexión real MT5↔Python verificada, por fin funcionando**: `conectividad.xm.demo()` conecta con la cuenta nueva y trae el balance real. En el camino se encontró y corrigió un bug: el símbolo de oro estaba hardcodeado como `"XAUUSD"`, pero en este servidor de XM se llama `"GOLD"` — no existe `XAUUSD` en su catálogo. Se agregó también un `symbol_select()` defensivo antes de pedir velas, para que un símbolo mal escrito dé un error claro en vez de uno genérico. Se encontró y borró de paso un `.env` duplicado suelto dentro de `tradebotbuilder/.venv/` que traía los valores viejos y generaba confusión al revisar el archivo.
+- **Arranca el manual visual para alumnos** ("Cómo abrir tu cuenta XM para MetaTrader 5"): un slider de una sola pieza (`mextradebot-mapa-tecnico/manual-cuenta-xm.html`), con el mismo sistema visual del mapa técnico (IBM Plex, paleta pergamino/oscuro), capturas reales incrustadas en base64, navegación por teclado/botones/puntos, y el link+código de afiliado copiables en la portada. Cubre 13 pasos hasta ahora: entrar con el link oficial, registro, panel de cuenta, elegir Demo, elegir MT5, elegir tipo de cuenta (Standard, con la razón de por qué no Ultra Low), configurar parámetros del robot, revisar el correo con ID/servidor, descargar la plataforma, elegir sistema operativo, y abrir el instalador. Queda pausado a propósito para retomar la conectividad — sigue pendiente el paso final de login dentro de MT5 (falta una captura) antes de darlo por completo.
+
+**Por qué:** la cuenta muerta llevaba bloqueando la verificación real de la conectividad desde ayer — con una cuenta viva, T-05 ya tiene lo único que le faltaba (un MT5 con sesión real para monitorear). El manual, aparte de ser material para alumnos, terminó sirviendo como el registro paso a paso de cómo se creó esta cuenta nueva. Detalle técnico completo (nombres exactos de archivos, credenciales) vive en `docs/manual-tecnico-interno.md` y en la memoria de la sesión, no aquí.
+
+---
+
+## 2026-09-09
+
+**Panel de Alumnos construido y migrado a base de datos real; primer intento de conexión real a MT5/XM**
+
+- **Panel de Alumnos (registro + login)**: nueva experiencia visual para que un alumno se registre, reciba el link al canal de Telegram, y desde ahí descargue los robots que quiera para conectarlos a su propia instalación de MT5 — decidido explícitamente que MexTradeBot no aloja un sistema de escritorio remoto compartido, cada alumno usa su propio MT5. Primero se probó sobre Google Sheets; a petición de Ricardo se migró la base de usuarios al Postgres real que ya existe en EasyPanel, con contraseñas guardadas con sal + hash, nunca en texto plano. Registro y login verificados en vivo, de punta a punta.
+- **Primer intento de conexión real a una cuenta de XM vía MT5**: se probó el conector ya construido (`conectividad.xm`) contra una cuenta demo real. Tras una sesión larga de diagnóstico, se encontró la causa real: la cuenta demo usada llevaba tiempo inactiva y XM la había congelado automáticamente — no era un problema del código ni de las credenciales. Queda pendiente repetir la prueba con una cuenta demo nueva.
+
+**Por qué:** el Panel de Alumnos es la pieza que faltaba entre "un alumno se inscribe" y "un alumno tiene un robot corriendo en su propia cuenta" — sin volver a pedirle credenciales de trading directo, que era el diseño que ya se había descartado por parecerse a copy trading. El detalle técnico completo (arquitectura del panel, esquema de base de datos, y el diagnóstico completo de la cuenta XM) vive en el manual técnico interno, no en este mapa público.
+
+---
+
 ## 2026-08-28
 
 **Paso 1b + Backtesting formal completos: 5 piezas construidas y probadas con datos reales**

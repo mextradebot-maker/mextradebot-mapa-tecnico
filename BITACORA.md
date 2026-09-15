@@ -4,6 +4,23 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-09-14
+
+**Catálogo de activos ampliado de 9 a 36 símbolos, con 5 horizontes de tiempo en vez de 3, indicadores de confluencia, y un filtro real de "solo mostrar lo que ya funciona" — todo definido con cuidado antes de tocar código, y verificado en producción, no solo probado**
+
+Sesión larga con un método distinto a las anteriores: primero se definió cada decisión de producto a detalle (qué símbolos, qué reglas, qué mostrar), después se construyó — no al revés.
+
+- **Catálogo ampliado y verificado símbolo por símbolo**: de 9 a 36 activos (más cruces de forex, índices bursátiles, metales/energía, cripto y un puñado de acciones, incluidas dos mexicanas). Cada candidato se cruzó contra la fuente de datos históricos **y** contra el catálogo real del broker antes de aceptarlo — algunos candidatos quedaron fuera precisamente por no existir en ambos lados a la vez (cobre solo como futuro con vencimiento, una criptomoneda sin datos históricos disponibles, la mayoría de las acciones mexicanas propuestas sin cobertura del broker). El catálogo pasó de vivir duplicado en tres lugares distintos a una sola fuente compartida por Telegram, el panel web y el análisis diario de mercado.
+- **De 3 horizontes de tiempo a 5**: se agregaron dos niveles de Swing más largos (semanal y mensual), cada uno con su propia tendencia — ya se sabía que la dirección del mercado puede ser distinta según la temporalidad, así que cada símbolo ahora se evalúa en los 5 horizontes, no en uno solo.
+- **Indicadores de confluencia añadidos, con una regla explícita de uso**: se suman RSI, medias móviles, MACD y retroceso de Fibonacci como confirmaciones opcionales — pero de **una a la vez**, nunca combinadas. Combinar varias reduce la muestra de operaciones y puede dar una falsa sensación de estrategia óptima cuando en realidad está sobreajustada al pasado; el sistema explica esto directamente al alumno en vez de solo restringirlo en silencio.
+- **Filtro real de viabilidad, no una etiqueta inventada**: antes de esta sesión no existía ningún cálculo real de "qué activos vale la pena mostrar". Ahora el catálogo se cruza contra los resultados reales del análisis diario y solo muestra por default los símbolos con evidencia real de operaciones históricas — el resto queda disponible en una lista completa desplegable, para quien quiera revisar el criterio.
+- **Dos bugs reales encontrados y corregidos al ampliar el análisis diario a los 5 horizontes**: uno ya existente (el resumen del catálogo no recibía los datos de resultado del backtest, llegaban vacíos sin que nadie lo notara) y uno nuevo (el horizonte mensual, al tener muy pocas velas, a veces no logra determinar una tendencia clara, y eso podía tumbar toda la corrida en vez de simplemente saltarse ese caso). Ambos corregidos y verificados con una corrida real contra los 36 símbolos.
+- **Bloqueo real encontrado, no de código**: la corrida de análisis diario llega hasta el paso de generar el resumen con IA y se detiene por falta de saldo en la cuenta usada ahí — el mismo pendiente de facturación que ya bloqueaba el monitoreo de la cuenta demo (ver entrada del 13). En cuanto se recargue, el catálogo termina de llenarse solo.
+
+**Por qué:** definir cada decisión con precisión antes de construir evitó tener que rehacer trabajo — varias de las suposiciones iniciales (qué activos "deberían" estar disponibles, qué tan simple sería activar más indicadores) no coincidían con lo que el sistema realmente soporta, y se descubrió a tiempo revisando el código real en vez de asumiendo. El detalle técnico completo (nombres exactos de hojas de cálculo, workflows y archivos) vive en `docs/panel-alumnos-catalogo-indicadores-spec.md` y en la memoria de la sesión, no aquí.
+
+---
+
 ## 2026-09-13
 
 **T-05 queda expuesto a internet de verdad (dominio + túnel + servicio), EA pegado a un chart real con AutoTrading activo, y T-04 gana autenticación mínima**

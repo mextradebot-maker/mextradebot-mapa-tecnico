@@ -4,6 +4,19 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-09-19
+
+**VPS gratuito de XM conectado de verdad a MT5, la pestaña "Cuenta demo" del panel ya muestra datos reales por primera vez, y se agregó una sexta pestaña de backtesting bajo demanda**
+
+- **Dominio público correcto para el Panel de Alumnos**: se detectó que `mextradebot-app.vercel.app` (el dominio real que se le va a dar a los alumnos, y donde después va a apuntar `mextradebot.com.mx`) no mostraba el panel — mostraba otro proyecto (el motor/API). Se corrigió con un proxy transparente: el alumno visita ese mismo dominio y nunca ve la dirección real donde vive el panel por detrás.
+- **El VPS gratuito de XM (conseguido por ser afiliado) ya está en uso real**: se instaló ahí MetaTrader 5 conectado a la cuenta demo de referencia, y el pequeño servicio que lee su balance/operaciones quedó corriendo como tarea programada de Windows — sobrevive sin que nadie tenga la sesión remota abierta. Resultado: la pestaña "Cuenta demo" del panel, que desde que se construyó solo mostraba un mensaje de "no se pudo conectar", **ya muestra el balance y las operaciones reales de la cuenta**.
+- **Aclaración de alcance importante, revisando el mapa completo de pantallas**: se confirmó que un alumno NO necesita conectar nada a esta infraestructura para usar su propio robot — descarga el robot y lo conecta a su propia cuenta XM, totalmente aparte. Este VPS solo sirve para mostrar la cuenta de referencia de Ricardo como prueba de que los robots funcionan de verdad. Quedó anotado como pendiente futuro (no construido todavía): una cuenta demo por cada activo del catálogo, con un proceso automático que las opere solas.
+- **Sexta pestaña del panel: "Mis Validaciones" (backtesting bajo demanda)**. Sorpresa favorable: los cálculos de backtest ya existían en el sistema (los usa el canal de Telegram desde hace tiempo), así que no hizo falta construir nada nuevo por detrás — solo conectar el panel a eso. Tiene dos modos: uno donde el alumno solo elige el símbolo y el sistema detecta la dirección solo, y otro donde el alumno elige todo a mano — este segundo se dejó listo a propósito para cuando exista el Constructor visual, sin tener que reconstruirlo entonces.
+
+**Por qué:** el detalle técnico completo (arquitectura del proxy, pasos exactos del VPS, diseño de las dos pestañas) vive en `docs/superpowers/` y en la memoria de la sesión, no aquí — esta entrada es el resumen para quien solo quiere saber qué avanzó y por qué importa, sin tener que leer el detalle técnico.
+
+---
+
 ## 2026-09-14
 
 **Catálogo de activos ampliado de 9 a 36 símbolos, con 5 horizontes de tiempo en vez de 3, indicadores de confluencia, y un filtro real de "solo mostrar lo que ya funciona" — todo definido con cuidado antes de tocar código, y verificado en producción, no solo probado**

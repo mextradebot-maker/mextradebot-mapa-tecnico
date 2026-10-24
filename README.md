@@ -10,4 +10,10 @@ Abre `index.html` en el navegador. No requiere instalación ni dependencias.
 
 ## Despliegue
 
-Importar este repositorio en Vercel como proyecto estático (framework preset: "Other"). No requiere variables de entorno ni comandos de build.
+**Actual (desde 23 oct 2026): VPS con EasyPanel, en `mapa.mextradebot.com.mx`, con usuario y clave.**
+
+El repositorio incluye un `Dockerfile` (nginx) que sirve `index.html`. Variables de entorno obligatorias en EasyPanel: `MAPA_USER` y `MAPA_PASS`. Sin ellas el contenedor no arranca, para que nunca se publique sin clave. El chequeo de salud es `/health`. No se guardan claves en el repositorio.
+
+Pasos en EasyPanel: crear una app desde este repositorio de GitHub con build por Dockerfile, agregar las dos variables, asignar el dominio y activar HTTPS. En Cloudflare: registro CNAME `mapa` hacia el mismo destino que `www`.
+
+**Anterior:** Vercel, como proyecto estático (framework preset "Other"). El equipo de Vercel fue bloqueado por uso justo el 23 oct 2026, por eso se migró.

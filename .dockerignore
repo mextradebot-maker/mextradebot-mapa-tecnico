@@ -1,0 +1,7 @@
+.git
+.vercel
+.env*
+assets
+manual-*.html
+BITACORA.md
+README.md

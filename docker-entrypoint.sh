@@ -8,6 +8,8 @@ if [ -z "$MAPA_USER" ] || [ -z "$MAPA_PASS" ]; then
   exit 1
 fi
 
-htpasswd -bc /etc/nginx/.htpasswd "$MAPA_USER" "$MAPA_PASS"
+htpasswd -bBc /etc/nginx/.htpasswd "$MAPA_USER" "$MAPA_PASS"
+# El proceso de nginx corre como usuario "nginx": debe poder leer el archivo (solo contiene el hash bcrypt)
+chown root:nginx /etc/nginx/.htpasswd
 chmod 640 /etc/nginx/.htpasswd
 echo "Mapa tecnico: autenticacion configurada para el usuario $MAPA_USER."

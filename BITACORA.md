@@ -4,6 +4,61 @@ Registro de trabajo día por día en este proyecto. Cada entrada resume qué se 
 
 ---
 
+## 2026-10-23
+
+**Conferencia en The Trading Festival México (12 y 13 nov): todo el material listo — guion, láminas, video, tres QR y un canal público de Telegram**
+
+- **Contexto:** XM invitó a Ricardo a una charla de 30 min para divulgar MexTradeBot (15 min de video + 15 min de preguntas). El material se entregó a XM Partners para que lo editen y le pongan su marca. Ricardo no sale en cámara: habla en vivo y el video corre detrás, sin audio.
+- **Guion** de ~1,500 palabras (intro, método en 4 pasos, planes y costos, dónde suscribirse, cuenta en XM con el bono del 100 %, VPS, Jarvis, cierre) y una **guía de sincronización** con la hora exacta de cada cambio de lámina y la frase en que ocurre.
+- **PowerPoint de 11 láminas** con marca de MexTradeBot y XM Partners: portada con imagen IA (un robot con corte ejecutivo toma una clase de trading), intro nueva, los 4 videos de diagramas (ecosistema, vida de un robot, datos y operación, flujo de membresía), planes, cuenta en XM, Jarvis y lámina final con Jarvis orquestando agentes de IA.
+- **Video de 16:07** en 1080p, sin audio: los bloques de cada lámina aparecen cuando se habla de ellos, con dos bloques libres (2 min en la portada y 1 min al final) para que Ricardo hable con sus palabras. Se generó exportando desde PowerPoint con tiempos por lámina.
+- **Tres códigos QR** con logo al centro, probados con lector: plan Trader mensual (Hotmart), registro en XM y comunidad de Telegram.
+- **Canal público de Telegram** `t.me/mextradebot_comunidad` para captar gente (el canal que ya existía es solo para quienes contrataron; la Comunidad de Hotmart es exclusiva para suscriptores). Con guía de textos, reglas y primeras publicaciones.
+- **Lenguaje cuidado de punta a punta:** sin promesas de ingresos ni "rentable", backtests presentados con sus límites (varias combinaciones resultaron compatibles con el azar), el bono descrito como algo que "multiplica el resultado, no lo asegura", Jarvis solo como "en desarrollo e informativo".
+
+**Pendiente:** entregar el material a XM por enlace (el video pesa ~138 MB), publicar y fijar el mensaje de bienvenida del canal, ensayar el ritmo con la guía, decidir si se corrige el texto "activos rentables" del video 4, y atender lo que pida XM (guía de marca, leyendas legales). Detalle completo en `docs/checkpoint-2026-10-23.md` del proyecto MexTradeBot.
+
+**Por qué:** la charla es la primera vez que MexTradeBot se presenta ante el público de un evento de trading junto a XM, así que el material se construyó con las mismas reglas de transparencia que ya gobiernan el sistema: mostrar los límites del backtest y no prometer resultados.
+
+---
+
+## 2026-09-21 → 2026-10-22
+
+**Resumen retroactivo: esta bitácora no se actualizó entre el 20 de septiembre y hoy. Lo siguiente se reconstruye de los checkpoints del proyecto (`docs/checkpoint-*.md`), donde está el detalle.**
+
+- **Master Trader y cuentas demo (21 sep):** el servicio local del VPS Windows ya devuelve el estado de las 5 cuentas demo conectadas en MT5 (4 de 5 correctas; una con credenciales por corregir) y existe el agente coordinador.
+- **Decisión de arquitectura "el cerebro" (25 sep):** las reglas deterministas guardadas en Postgres son las que deciden; la IA solo propone reglas, no decide. Backend de **licencias** construido en una rama aparte, con una regla única para el tamaño de lote que une conectividad y riesgo. Faltaba desplegar variables de entorno.
+- **Licencias automatizadas (26 sep):** el acceso DEMO se activa al conectar la cuenta de XM, el acceso REAL al pagar, y cada alumno recibe un robot (`.ex5`) personalizado.
+- **Infraestructura (28 sep):** la API quedó en el VPS gestionado con EasyPanel, detrás de `mextradebot.com.mx` y `www` (Cloudflare); se resolvió el consumo de CPU del servidor, causado por procesos de otro proyecto.
+- **Reglas de riesgo y Motor SMC v2 (29 sep):** pérdida máxima de 3 % con cierre forzado, no abrir si el stop supera 2 %, breakeven y trailing (EA v1.15); Motor SMC v2 con 7 temporalidades, almacén de velas y backtest largo en producción.
+- **3 oct:** EA v1.17 en las 5 cuentas, catálogo real de 34 activos, ficha de descarga en producción y bot de Telegram arreglado. Se diagnosticó que los errores 502 venían de un bucle de reinicios del servicio.
+- **13–14 oct:** correo con dominio propio y páginas legales con soporte@ desplegados; arreglo del 502 con un proceso hijo; estándar de seguridad de 20 puntos aplicado; curso importado a Hotmart; router de eventos de Hotmart (H-00) activo, enviando por Brevo con el dominio autenticado.
+- **19–20 oct:** programa de afiliados de Hotmart (40 % recurrente) con kit y página; cumplimiento legal (términos, reglas de afiliado, avisos de riesgo, lenguaje neutro en panel, bot y correos).
+- **21 oct:** casilla de consentimiento en el registro, `/alumnos` corregido, avisos a Slack (ventas, afiliados, errores, salud, motor de trading), y **carga histórica completa: 102 series y 204 backtests largos**. Resultado honesto: las combinaciones marcadas como buenas son compatibles con el azar (expectativa agregada cercana a cero) y las ventas en 1H y 4H pierden. Decisión: no cambiar el stop por ahora.
+- **22 oct:** se instalaron alternativas a Adobe (PhotoCraft, VectorCraft, SoundCraft) con acceso confinado a una carpeta de trabajo.
+
+**Por qué:** el hallazgo más importante del periodo es el del 21 oct: el sistema es transparente al reportar que el backtest largo no demuestra ventaja estadística, y eso marca cómo se habla del producto (sin "rentable", sin promesas) y qué sigue (revisar juntos el backtest y las estrategias antes de cualquier afirmación comercial).
+
+---
+
+## 2026-09-20
+
+**Fase 2 BD SMC persistente terminada: el backtesting del wizard ahora puede arrancar desde la fecha en que cada símbolo entró al catálogo, no solo desde "últimos N días"**
+
+- **Tabla `catalogo_activos` en Postgres**: estructura nueva (`simbolo`, `temporalidad`, `fecha_inicio DATE`, `activo BOOL`, clave primaria compuesta), con 180 pares precargados (36 símbolos × 5 temporalidades: Scalping, Intraday, Swing H/S/M), todos con `fecha_inicio = 2026-09-20` — la fecha real de arranque del catálogo completo. La migración vive en `persistencia/migraciones.py` y se aplica sola al levantar el sistema; no requiere intervención manual.
+- **Parámetro `desde_catalogo` en `/api/backtest` y `/api/setups`**: cuando el panel (o cualquier llamador) lo manda como `true`, el sistema busca `fecha_inicio` en `catalogo_activos` para ese par símbolo+temporalidad y arranca el backtest desde ahí, ignorando el parámetro `dias`. Si Postgres no está disponible o el par no existe en el catálogo, cae silenciosamente al comportamiento de siempre (`dias`). Diseño deliberado: no rompe nada que ya funcionaba.
+- **Endpoint nuevo `/api/catalogo`** (GET y POST): devuelve la lista completa de entradas del catálogo con sus fechas de inicio. Registrado en el router central `api/analizar.py`. Útil para que el panel muestre al alumno desde cuándo existe cada símbolo en el catálogo.
+- **Toggle "Desde catálogo" / "Histórico completo" en la pestaña "Mis Validaciones" del wizard**: botón nuevo en la UI del panel de alumnos (Tab 6). Cuando está activo (azul), el backtest usa `desde_catalogo=true`; cuando no, usa el rango histórico por defecto. El estado se guarda en memoria dentro de la función JS de esa sección, sin localStorage — intencional: el alumno siempre arranca viendo el modo conservador por defecto.
+- **Commit y push**: 7 archivos Python en un solo commit (`f1662a1`) al repo `mextradebot-maker/tradebotbuilder` → Vercel redesplegó automáticamente. El HTML del wizard se aplicó directamente al workflow `ltIbLXX62h0hXl7K` de n8n (nodo "Responder HTML"), sin pasar por git — ese nodo sigue siendo la fuente de verdad del panel.
+
+**Pendiente técnico inmediato**: las migraciones de Postgres todavía no se han corrido contra el servidor real del VPS — la tabla `catalogo_activos` y su seed de 180 pares aún no existen en producción. Hay que ejecutar las migraciones una vez para que el parámetro `desde_catalogo` funcione de extremo a extremo; hasta entonces el sistema cae al comportamiento de "N días" (sin error visible para el alumno).
+
+**Siguiente fase — Master Trader (no iniciada):** una cuenta demo XM por cada activo del catálogo + un agente autónomo que abra y cierre posiciones en esas cuentas siguiendo las señales que el mismo catálogo ya calcula. Los alumnos no dependen de esto para nada — conectan su propia cuenta MT5 de forma independiente. Esta fase requiere diseño antes de código (N cuentas MT5 en paralelo, envío de órdenes desde Python, extensión del endpoint de la pestaña "Cuenta demo").
+
+**Por qué**: la Fase 1 (snapshots persistentes de setups) ya estaba; la Fase 2 añade el eje temporal — saber desde cuándo cada símbolo está "vigente" en el catálogo permite que el alumno vea el desempeño histórico desde el inicio real del catálogo, no un horizonte arbitrario de días. Detalle técnico (nombres exactos de archivos, commit hash, lógica de graceful degradation) en la memoria del proyecto y en los archivos de código correspondientes.
+
+---
+
 ## 2026-09-19
 
 **VPS gratuito de XM conectado de verdad a MT5, la pestaña "Cuenta demo" del panel ya muestra datos reales por primera vez, y se agregó una sexta pestaña de backtesting bajo demanda**

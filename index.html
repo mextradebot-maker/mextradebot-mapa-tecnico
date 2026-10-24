@@ -334,7 +334,8 @@
       <li><a href="#fondeo"><span class="num">08</span>Cuentas de fondeo</a></li>
       <li><a href="#hallazgo"><span class="num">09</span>El hallazgo clave</a></li>
       <li><a href="#plan-construccion"><span class="num">10</span>Plan de construcción</a></li>
-      <li><a href="#bitacora"><span class="num">11</span>Bitácora</a></li>
+      <li><a href="#estado"><span class="num">10b</span>Estado al 23 oct</a></li>
+<li><a href="#bitacora"><span class="num">11</span>Bitácora</a></li>
       <li><a href="#redes"><span class="num">12</span>Redes sociales</a></li>
       <li><a href="#fuentes"><span class="num">13</span>Fuentes</a></li>
     </ul>
@@ -724,10 +725,69 @@
         </div>
       </section>
 
+      <!-- 10b -->
+      <section id="estado">
+        <div class="sec-head"><span class="sec-num">10b</span><h2>Estado al 23 de octubre de 2026</h2></div>
+        <p class="sec-dek">Dónde está cada pieza del sistema hoy, qué se hizo desde el plan original y qué falta. Checkpoint del 23 oct 2026; el detalle por fecha está en la Bitácora.</p>
+
+        <div class="table-wrap"><table>
+          <tr><th>Pieza</th><th>Estado</th><th>Nota</th></tr>
+          <tr><td>Motor propio SMC (v2)</td><td>✅ En producción</td><td>7 temporalidades, almacén de velas y backtest largo. Catálogo real de 34 activos. El backtest largo (102 series, 204 pruebas) <strong>no demuestra ventaja estadística</strong>: las combinaciones marcadas como buenas son compatibles con el azar y las ventas en 1H/4H pierden. Por eso no se afirma rentabilidad en ningún material.</td></tr>
+          <tr><td>Reglas de riesgo del robot (EA v1.17)</td><td>✅ Operando en 5 cuentas demo</td><td>Pérdida máxima con cierre forzado, no abrir si el stop es demasiado grande, breakeven y trailing. Falta aplicar la regla 5 para swing.</td></tr>
+          <tr><td>Master Trader (cuentas demo + coordinador)</td><td>✅ Funcionando</td><td>5 cuentas demo en MT5 en el VPS Windows. Pendiente: verificar un símbolo de petróleo y las credenciales de una cuenta.</td></tr>
+          <tr><td>"Cerebro" y licencias</td><td>🟡 Backend listo, falta desplegar</td><td>Decisión de arquitectura: deciden reglas deterministas en Postgres; la IA solo propone reglas. Licencias: DEMO al conectar XM, REAL al pagar, robot personalizado.</td></tr>
+          <tr><td>Panel de alumnos y registro</td><td>✅ En producción</td><td>Registro con consentimiento (términos, aviso de riesgo, privacidad), catálogo, descarga de robots. Recuperación de contraseña aplazada.</td></tr>
+          <tr><td>Ventas y correos (Hotmart + Brevo)</td><td>✅ Activo</td><td>Router de eventos de Hotmart, correos con dominio propio, programa de afiliados (40 % recurrente). Falta compra de prueba real y lista con consentimiento para campañas.</td></tr>
+          <tr><td>Telegram</td><td>🟡 Bot y canal público</td><td>El bot entrega robots; el canal de suscriptores es privado. Nuevo canal público de captación: <code>t.me/mextradebot_comunidad</code>. Falta publicar su mensaje de bienvenida y poner descripción al bot.</td></tr>
+          <tr><td>Avisos internos (Slack)</td><td>✅ Activo</td><td>Ventas, afiliados, errores de automatizaciones, salud del sitio y motor de trading.</td></tr>
+          <tr><td>Presentación con XM (charla 12–13 nov)</td><td>✅ Material listo</td><td>Guion, PowerPoint de 11 láminas, video de 16:07 sin audio, guía de sincronización y tres QR. Falta entregarlo a XM Partners y lo que ellos pidan.</td></tr>
+          <tr><td>Jarvis (siguiente versión)</td><td>🔲 En desarrollo</td><td>Asistente que avisaría de nuevas estrategias e informaría las órdenes que orquesta el Master Trader, con la decisión siempre en el usuario. Se presenta como "en desarrollo e informativo", nunca como señales.</td></tr>
+          <tr><td>Constructor visual completo</td><td>🔲 Condicional</td><td>Sigue sujeto a que el motor, el pipeline y la cara cliente estén maduros (ver Sección 10).</td></tr>
+        </table></div>
+
+        <div class="box gotcha">
+          <div class="box-label">⚠ Lo que más pesa hoy</div>
+          <p>El hallazgo del backtest largo manda sobre el resto: antes de afirmar cualquier cosa sobre resultados hay que revisar con calma las estrategias (qué hacer con las ventas en 1H/4H y el umbral de muestra en temporalidades largas). El stop queda sin cambios hasta revisarlo juntos.</p>
+        </div>
+
+        <h3>Pendientes principales</h3>
+        <ul>
+          <li><strong>Con XM:</strong> entregar el material de la charla, guía de marca y leyendas legales en pantalla, y confirmación por escrito de los términos de la promoción del bono.</li>
+          <li><strong>Telegram:</strong> mensaje de bienvenida con aviso de riesgo fijado en el canal público, y descripción y aviso en <code>/start</code> del bot.</li>
+          <li><strong>Ventas:</strong> compra de prueba con reembolso, lista con consentimiento para la campaña, revisión de textos del Club y de Hotmart.</li>
+          <li><strong>Legal:</strong> pasar el expediente de revisión al abogado.</li>
+          <li><strong>Motor y producto:</strong> pruebas de punta a punta del robot en una demo nueva, despliegue del cerebro de licencias, revisión conjunta del backtest largo, y diseño de Jarvis antes de comunicarlo como disponible.</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué esta sección:</strong> la Bitácora cuenta la historia por fecha; esta tabla responde de un vistazo "dónde estamos". El detalle de cada punto vive en los checkpoints del proyecto, no en este mapa público.</p>
+      </section>
+
       <!-- 11 -->
       <section id="bitacora">
         <div class="sec-head"><span class="sec-num">11</span><h2>Bitácora</h2></div>
         <p class="sec-dek">Registro de trabajo día por día en este proyecto — qué se hizo, qué se decidió y por qué.</p>
+
+        <h3>2026-10-23 — Conferencia en The Trading Festival México: material listo</h3>
+        <p>XM invitó a Ricardo a una charla de 30 minutos (15 de video y 15 de preguntas) los días 12 y 13 de noviembre en la CDMX. Se preparó todo el material, con la marca de MexTradeBot y XM Partners.</p>
+        <ul>
+          <li><strong>Guion y guía de sincronización:</strong> unas 1,500 palabras (método en 4 pasos, planes y costos, dónde suscribirse, cuenta en XM con el bono del 100 %, VPS, Jarvis) y una guía con la hora exacta de cada cambio de lámina. Ricardo no sale en cámara: habla en vivo y el video corre detrás, sin audio.</li>
+          <li><strong>PowerPoint de 11 láminas y video de 16:07:</strong> portada con imagen IA de un robot con corte ejecutivo tomando una clase de trading, los cuatro diagramas animados del sistema, planes, cuenta en XM y una lámina final con Jarvis orquestando agentes de IA. Dos bloques libres para que Ricardo hable con sus palabras.</li>
+          <li><strong>Tres códigos QR</strong> con logo al centro, probados con lector: plan Trader mensual, registro en XM y comunidad de Telegram.</li>
+          <li><strong>Canal público de Telegram</strong> para captar gente, aparte del canal de suscriptores.</li>
+          <li><strong>Lenguaje cuidado:</strong> sin promesas de ingresos ni "rentable"; backtests mostrados con sus límites; el bono descrito como algo que multiplica el resultado sin asegurarlo; Jarvis solo como "en desarrollo e informativo".</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> es la primera vez que MexTradeBot se presenta ante un público de trading junto a XM, así que el material siguió las mismas reglas de transparencia del sistema: mostrar los límites del backtest y no prometer resultados.</p>
+
+        <h3>2026-09-21 → 2026-10-22 — Resumen retroactivo</h3>
+        <p>La bitácora no se actualizó en este periodo; se reconstruye aquí desde los checkpoints del proyecto.</p>
+        <ul>
+          <li><strong>Master Trader y cerebro (21–26 sep):</strong> estado de las 5 cuentas demo leído desde el VPS Windows; decisión de arquitectura "reglas deterministas deciden, la IA solo propone"; backend de licencias (DEMO al conectar XM, REAL al pagar, robot personalizado).</li>
+          <li><strong>Infraestructura y riesgo (28–29 sep):</strong> API en el VPS gestionado detrás de <code>mextradebot.com.mx</code>; reglas de riesgo (pérdida máxima con cierre forzado, no abrir con stop demasiado grande, breakeven y trailing); Motor SMC v2 con 7 temporalidades y backtest largo en producción.</li>
+          <li><strong>3 oct:</strong> EA v1.17 en las 5 cuentas, catálogo real de 34 activos, bot de Telegram arreglado; diagnóstico de los errores 502 (bucle de reinicios).</li>
+          <li><strong>13–20 oct:</strong> correo y páginas legales con dominio propio, arreglo del 502, estándar de seguridad, Hotmart con router de eventos y Brevo, programa de afiliados (40 % recurrente), cumplimiento legal y lenguaje neutro.</li>
+          <li><strong>21 oct:</strong> consentimiento en el registro, avisos a Slack y carga histórica completa (102 series, 204 backtests largos). Resultado honesto: sin ventaja estadística demostrada; las ventas en 1H y 4H pierden. El stop no se cambia por ahora.</li>
+          <li><strong>22 oct:</strong> alternativas gráficas a Adobe instaladas con acceso confinado a una carpeta de trabajo.</li>
+        </ul>
+        <p style="color:var(--text-dim); font-size:.92rem;"><strong>Por qué:</strong> el hallazgo del 21 oct define cómo se habla del producto (sin "rentable", sin promesas) y qué sigue: revisar juntos el backtest antes de cualquier afirmación comercial. Las entradas del 9 al 20 de septiembre están en <code>BITACORA.md</code> del repositorio.</p>
 
         <h3>2026-08-28 — Paso 1b + Backtesting formal completos: 5 piezas construidas y probadas con datos reales</h3>
         <p>Antes de tocar n8n, se cerró toda la Conectividad (Paso 1b) y el Backtesting formal — cinco piezas nuevas, cada una validada contra el sistema real (dukascopy, MT5, ForexFactory), no con datos de prueba inventados.</p>
